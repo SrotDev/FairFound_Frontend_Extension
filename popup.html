@@ -11,7 +11,6 @@
     <!-- Header -->
     <header class="header">
       <div class="logo">
-        <span class="logo-icon">⚖️</span>
         <h1>FairFound</h1>
       </div>
       <p class="tagline">Smart Freelancer Insights</p>
@@ -31,6 +30,14 @@
 
     <!-- Leaderboard Tab Content -->
     <section id="leaderboard-tab" class="tab-content active">
+      <!-- Category Filter -->
+      <div class="category-filter">
+        <label for="category-select">Category:</label>
+        <select id="category-select">
+          <option value="all">All Categories</option>
+        </select>
+      </div>
+
       <div class="leaderboard-toggle">
         <button class="toggle-btn active" data-board="marketplace">
           Marketplace Ranking
@@ -76,12 +83,12 @@
         
         <div class="input-group">
           <label for="freelancer1-url">Freelancer 1 Profile URL</label>
-          <input type="url" id="freelancer1-url" placeholder="https://platform.com/freelancer/username1">
+          <input type="url" id="freelancer1-url" placeholder="https://fairfound.com/freelancer/john-doe">
         </div>
         
         <div class="input-group">
           <label for="freelancer2-url">Freelancer 2 Profile URL</label>
-          <input type="url" id="freelancer2-url" placeholder="https://platform.com/freelancer/username2">
+          <input type="url" id="freelancer2-url" placeholder="https://fairfound.com/freelancer/jane-smith">
         </div>
         
         <button class="compare-btn" id="compare-btn">

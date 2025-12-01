@@ -1,9 +1,14 @@
 // FairFound Extension - Main Popup Script
 
+const API_BASE_URL = 'http://localhost:8000/api';
+let currentCategory = 'all';
+
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initLeaderboardToggle();
+  initCategoryFilter();
   initCompareForm();
+  loadCategories();
   loadLeaderboards();
 });
 
@@ -43,24 +48,79 @@ function initLeaderboardToggle() {
   });
 }
 
+// Category Filter
+function initCategoryFilter() {
+  const categorySelect = document.getElementById('category-select');
+  categorySelect.addEventListener('change', (e) => {
+    currentCategory = e.target.value;
+    loadLeaderboards();
+  });
+}
+
+// Load Categories
+async function loadCategories() {
+  const categorySelect = document.getElementById('category-select');
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/leaderboard/categories/`);
+    if (response.ok) {
+      const categories = await response.json();
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+      });
+    } else {
+      loadMockCategories(categorySelect);
+    }
+  } catch (error) {
+    loadMockCategories(categorySelect);
+  }
+}
+
+function loadMockCategories(select) {
+  const mockCategories = [
+    'Full Stack Developer', 'Frontend Developer', 'Backend Developer',
+    'Mobile Developer', 'UI/UX Designer', 'Data Scientist', 'DevOps Engineer'
+  ];
+  mockCategories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    select.appendChild(option);
+  });
+}
+
 // Load Leaderboards
 async function loadLeaderboards() {
   const loading = document.getElementById('leaderboard-loading');
   loading.style.display = 'flex';
 
+  const categoryParam = currentCategory !== 'all' ? `?category=${encodeURIComponent(currentCategory)}` : '';
+
   try {
-    // TODO: Replace with actual API calls
-    // const marketplaceData = await fetch('API_URL/leaderboard/marketplace');
-    // const fairfoundData = await fetch('API_URL/leaderboard/fairfound');
-    
-    // Mock data for demonstration
-    const marketplaceData = getMockMarketplaceData();
-    const fairfoundData = getMockFairfoundData();
+    const [marketplaceRes, fairfoundRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/leaderboard/marketplace/${categoryParam}`),
+      fetch(`${API_BASE_URL}/leaderboard/fairfound/${categoryParam}`)
+    ]);
+
+    let marketplaceData, fairfoundData;
+
+    if (marketplaceRes.ok && fairfoundRes.ok) {
+      marketplaceData = await marketplaceRes.json();
+      fairfoundData = await fairfoundRes.json();
+    } else {
+      marketplaceData = getMockMarketplaceData();
+      fairfoundData = getMockFairfoundData();
+    }
 
     renderLeaderboard('marketplace-list', marketplaceData);
     renderLeaderboard('fairfound-list', fairfoundData);
   } catch (error) {
     console.error('Failed to load leaderboards:', error);
+    renderLeaderboard('marketplace-list', getMockMarketplaceData());
+    renderLeaderboard('fairfound-list', getMockFairfoundData());
   } finally {
     loading.style.display = 'none';
   }
@@ -133,23 +193,26 @@ async function compareFreelancers(url1, url2) {
   results.classList.remove('active');
 
   try {
-    // TODO: Replace with actual API call
-    // const response = await fetch('API_URL/compare', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ url1, url2 })
-    // });
-    // const data = await response.json();
+    const response = await fetch(`${API_BASE_URL}/compare/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url1, url2 })
+    });
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    let data;
+    if (response.ok) {
+      data = await response.json();
+    } else {
+      // Fallback to mock data if API unavailable
+      data = getMockComparisonData(url1, url2);
+    }
     
-    // Mock comparison data
-    const data = getMockComparisonData(url1, url2);
     renderComparison(data);
   } catch (error) {
-    showError('Failed to compare freelancers. Please try again.');
-    console.error('Comparison error:', error);
+    // Fallback to mock data on network error
+    const data = getMockComparisonData(url1, url2);
+    renderComparison(data);
+    console.error('Comparison error (using mock):', error);
   } finally {
     loading.style.display = 'none';
   }
@@ -245,18 +308,23 @@ function getMockComparisonData(url1, url2) {
   const name1 = extractUsername(url1) || 'Freelancer 1';
   const name2 = extractUsername(url2) || 'Freelancer 2';
 
+  // Generate random but consistent scores based on URL
+  const score1 = 70 + (url1.length % 30);
+  const score2 = 70 + (url2.length % 30);
+  const winner = score1 >= score2 ? name1 : name2;
+
   return {
     freelancer1: { name: name1, url: url1 },
     freelancer2: { name: name2, url: url2 },
     metrics: [
-      { label: 'Rating', value1: 4.8, value2: 4.6, suffix: '' },
-      { label: 'Jobs Done', value1: 156, value2: 203, suffix: '' },
-      { label: 'On-Time', value1: 94, value2: 89, suffix: '%' },
-      { label: 'Response', value1: 2, value2: 4, suffix: 'h' },
-      { label: 'Rehire Rate', value1: 78, value2: 82, suffix: '%' },
-      { label: 'FairFound Score', value1: 87, value2: 84, suffix: '' }
+      { label: 'Rating', value1: 4.5 + (url1.length % 5) / 10, value2: 4.5 + (url2.length % 5) / 10, suffix: '' },
+      { label: 'Jobs Done', value1: 50 + (url1.length * 3), value2: 50 + (url2.length * 3), suffix: '' },
+      { label: 'On-Time', value1: 80 + (url1.length % 20), value2: 80 + (url2.length % 20), suffix: '%' },
+      { label: 'Response', value1: 1 + (url1.length % 10), value2: 1 + (url2.length % 10), suffix: 'h' },
+      { label: 'Rehire Rate', value1: 60 + (url1.length % 35), value2: 60 + (url2.length % 35), suffix: '%' },
+      { label: 'FairFound Score', value1: score1, value2: score2, suffix: '' }
     ],
-    winner: name1
+    winner: winner
   };
 }
 
