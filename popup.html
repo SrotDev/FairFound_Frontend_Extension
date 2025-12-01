@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FairFound</title>
+  <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">⚖️</span>
+        <h1>FairFound</h1>
+      </div>
+      <p class="tagline">Smart Freelancer Insights</p>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="leaderboard">
+        <span class="tab-icon">🏆</span>
+        Leaderboards
+      </button>
+      <button class="tab-btn" data-tab="compare">
+        <span class="tab-icon">⚖️</span>
+        Compare
+      </button>
+    </nav>
+
+    <!-- Leaderboard Tab Content -->
+    <section id="leaderboard-tab" class="tab-content active">
+      <div class="leaderboard-toggle">
+        <button class="toggle-btn active" data-board="marketplace">
+          Marketplace Ranking
+        </button>
+        <button class="toggle-btn" data-board="fairfound">
+          FairFound Ranking
+        </button>
+      </div>
+
+      <!-- Marketplace Leaderboard -->
+      <div id="marketplace-board" class="leaderboard-section active">
+        <div class="section-header">
+          <h3>Marketplace Rankings</h3>
+          <span class="info-badge" title="Rankings from the marketplace platform">ℹ️</span>
+        </div>
+        <div class="leaderboard-list" id="marketplace-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- FairFound Leaderboard -->
+      <div id="fairfound-board" class="leaderboard-section">
+        <div class="section-header">
+          <h3>FairFound Rankings</h3>
+          <span class="info-badge" title="Rankings based on our proprietary equation">ℹ️</span>
+        </div>
+        <div class="leaderboard-list" id="fairfound-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="loading" id="leaderboard-loading">
+        <div class="spinner"></div>
+        <p>Loading rankings...</p>
+      </div>
+    </section>
+
+    <!-- Compare Tab Content -->
+    <section id="compare-tab" class="tab-content">
+      <div class="compare-form">
+        <h3>Compare Freelancers</h3>
+        <p class="form-desc">Enter profile URLs to compare two freelancers</p>
+        
+        <div class="input-group">
+          <label for="freelancer1-url">Freelancer 1 Profile URL</label>
+          <input type="url" id="freelancer1-url" placeholder="https://platform.com/freelancer/username1">
+        </div>
+        
+        <div class="input-group">
+          <label for="freelancer2-url">Freelancer 2 Profile URL</label>
+          <input type="url" id="freelancer2-url" placeholder="https://platform.com/freelancer/username2">
+        </div>
+        
+        <button class="compare-btn" id="compare-btn">
+          <span>Compare Now</span>
+          <span class="btn-icon">→</span>
+        </button>
+      </div>
+
+      <!-- Comparison Results -->
+      <div class="comparison-results" id="comparison-results">
+        <div class="comparison-header">
+          <div class="freelancer-header" id="f1-header">
+            <div class="avatar">F1</div>
+            <span class="name">Freelancer 1</span>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="freelancer-header" id="f2-header">
+            <div class="avatar">F2</div>
+            <span class="name">Freelancer 2</span>
+          </div>
+        </div>
+
+        <div class="metrics-comparison" id="metrics-comparison">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="comparison-summary" id="comparison-summary">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="loading" id="compare-loading">
+        <div class="spinner"></div>
+        <p>Analyzing profiles...</p>
+      </div>
+
+      <div class="error-message" id="compare-error">
+        <span class="error-icon">⚠️</span>
+        <p id="error-text">Please enter valid profile URLs</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Powered by <strong>FairFound</strong></p>
+    </footer>
+  </div>
+
+  <script src="scripts/popup.js"></script>
+</body>
+</html>
